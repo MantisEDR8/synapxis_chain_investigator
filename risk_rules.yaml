@@ -1,0 +1,34 @@
+# v2 — Reglas y umbrales (editables)
+weights:
+  # Riesgos altos (positivos suman riesgo)
+  ponzi_contract: 30           # 'to' o 'contract' en listas ponzi/scam
+  scam_address: 25             # 'from' o 'to' listado como scam
+  mixer_or_bridge: 20          # interacción con mixers/bridges conocidos
+  layering_burst: 15           # >=4 transfers en una sola tx
+  flow_drain_only: 15          # solo salidas desde la wallet origen
+  contract_to_unknown: 10      # 'to' parece contrato (según logs), no etiquetado
+  high_activity_nonce: 10      # nonce >= 50 (actividad saliente notable)
+  has_tokens_unknown: 5        # hay transfers pero sin stables etiquetados
+
+  # Factores que reducen riesgo (negativos)
+  deposit_to_exchange: -20     # destino es exchange KYC
+  stablecoin_usage: -10        # se detecta uso de stablecoins conocidas
+  low_activity_nonce: -5       # nonce <= 2 (actividad muy baja)
+
+thresholds:
+  medium: 30
+  high: 60
+
+# Archivos de etiquetas opcionales (si no existen, se ignoran)
+labels:
+  exchanges: data/exchanges.yaml
+  mixers_bridges: data/mixers_bridges.yaml
+  ponzi_contracts: data/ponzi_contracts.yaml
+  scam_addresses: data/scam_addresses.yaml
+  stable_contracts: data/stable_contracts.yaml  # ERC-20/TRC-20 contract addresses
+
+# Parámetros
+params:
+  nonce_high: 50
+  nonce_low: 2
+

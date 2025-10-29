@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Synapxis Chain Investigator</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Synapxis Chain Investigator <span class="badge">Local • Free APIs</span></h1>
+    <div class="card">
+      <form method="post" action="/analyze">
+        <label for="input_id">Wallet o Tx Hash</label>
+        <input id="input_id" name="input_id" type="text" placeholder="0x..." required />
+
+        <label for="chain">Red</label>
+        <select id="chain" name="chain">
+          <option value="auto" selected>Auto</option>
+          <option value="ethereum">Ethereum</option>
+          <option value="polygon">Polygon</option>
+        </select>
+
+        <div class="actions">
+          <button class="primary" type="submit">Analizar</button>
+        </div>
+      </form>
+    </div>
+        <div style="margin-top:12px;">
+  <a href="/" class="btn">Nuevo análisis</a>
+</div>
+
+    {% if result %}
+    <div class="card" style="margin-top:20px;">
+      <h3>Resultado</h3>
+      <p><strong>Resumen:</strong> {{ result.summary }}</p>
+      <ul>
+        {% for f in result.files %}
+          <li><a href="{{ f.url }}" target="_blank">{{ f.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <footer>
+      Emitido por: Synapxis — Departamento de Análisis Blockchain • Documento preliminar — uso interno o académico.
+    </footer>
+  </div>
+</body>
+</html>

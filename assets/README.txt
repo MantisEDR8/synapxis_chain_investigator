@@ -1,0 +1,1 @@
+Coloca aquí tu logo como 'logo.jpeg' si quieres portada con imagen.

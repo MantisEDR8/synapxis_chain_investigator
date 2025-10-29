@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: synapxis-chain-investigator
+    env: python
+    plan: free
+    buildCommand: "pip install --no-cache-dir -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port 10000"
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.10
+      - key: LABELS_URLS_JSON
+        value: >
+          {
+            "scam_addresses": [
+              "https://raw.githubusercontent.com/WatchPug/scam-addresses/main/addresses.txt"
+            ],
+            "ponzi_contracts": [
+              "https://raw.githubusercontent.com/MythXSecurity/known-bad-contracts/master/addresses.txt"
+            ],
+            "mixers_bridges": [
+              "https://raw.githubusercontent.com/OffcierCia/DeFi-Developer-Road-Map/main/src/resources/addresses/mixers.txt"
+            ],
+            "exchanges": [
+              "https://raw.githubusercontent.com/spothq/cryptocurrency-exchanges/master/exchanges.json"
+            ],
+            "stable_contracts": [
+              "https://raw.githubusercontent.com/ethereum-lists/tokens/master/tokens/eth/0xdac17f958d2ee523a2206206994597c13d831ec7.json"
+            ]
+          }
+
