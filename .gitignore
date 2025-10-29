@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.venv/
+venv/
+outputs/*
+!outputs/.gitkeep
+*.pdf
+*.csv
+Plantilla_Informe_Wallet_Synapxis.docx
