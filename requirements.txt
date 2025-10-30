@@ -8,5 +8,4 @@ pydantic
 python-dotenv
 lxml
 python-multipart
-Add python-multipart to requirements
 
