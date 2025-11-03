@@ -392,6 +392,14 @@ def analyze_get_redirect():
 def download(filename: str):
     filepath = os.path.join(OUTPUT_DIR, filename)
     return FileResponse(filepath, filename=filename)
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/version")
+def version():
+    return {"app": "Synapxis Chain Investigator", "version": "1.0.0"}
+
 if __name__ == "__main__":
     import uvicorn
     import os
