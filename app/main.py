@@ -6,13 +6,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 
-from services.apis import (
+from app.services.apis import (
     is_tx_hash, is_address, get_tx_receipt, get_block_info,
     parse_erc20_transfers_from_receipt, get_tron_tx,
     get_eth_address_stats, get_tron_account
 )
-from services.report import generate_docx_and_maybe_pdf
-from services.risk_engine import evaluate as risk_evaluate
+from app.services.report import generate_docx_and_maybe_pdf
+from app.services.risk_engine import evaluate as risk_evaluate
 
 # ---------------------------
 # Config & logging
