@@ -14,6 +14,14 @@ load_dotenv()
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
+def http_get(url, **kwargs):
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+    return requests.get(url, **kwargs)
+
+def http_post(url, **kwargs):
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+    return requests.post(url, **kwargs)
+
 # ---------------------------
 # Detectores básicos
 # ---------------------------
