@@ -24,7 +24,6 @@ def safe_request(func):
 
 # Límite de tamaño de entrada para evitar abusos
 MAX_INPUT_LEN = 120
-if len(input_id) > MAX_INPUT_LEN:
 
 load_dotenv()
 
