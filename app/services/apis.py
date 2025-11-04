@@ -35,10 +35,12 @@ load_dotenv()
 DEFAULT_TIMEOUT = 15  # segundos
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
+@safe_request
 def http_get(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return http_get(url, **kwargs)
 
+@safe_request
 def http_post(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return http_post(url, **kwargs)
@@ -61,6 +63,7 @@ def _chainid_for(chain: str) -> int:
 # ---------------------------
 # Etherscan V2 (ETH / Polygon): TX, BLOQUE
 # ---------------------------
+@safe_request
 def get_tx_receipt(txhash: str, chain: str = "auto"):
     """
     Usa Etherscan V2 Multichain e intenta Polygon primero si chain=auto.
@@ -73,6 +76,7 @@ def get_tx_receipt(txhash: str, chain: str = "auto"):
     data = _etherscan_v2_proxy_receipt(txhash, chain="ethereum")
     return data, "ethereum"
 
+@safe_request
 def _etherscan_v2_proxy_receipt(txhash: str, chain: str):
     base = "https://api.etherscan.io/v2/api"
     params = {
@@ -89,6 +93,7 @@ def _etherscan_v2_proxy_receipt(txhash: str, chain: str):
     except Exception:
         return {"status": "0", "message": "non_json_response", "result": None}
 
+@safe_request
 def get_block_info(block_number_hex: str, chain: str):
     base = "https://api.etherscan.io/v2/api"
     params = {
@@ -109,6 +114,7 @@ def get_block_info(block_number_hex: str, chain: str):
 # ---------------------------
 # Etherscan V2 (ETH / Polygon): BALANCE y ACTIVIDAD
 # ---------------------------
+@safe_request
 def _etherscan_v2_proxy_eth_getBalance(address: str, chain: str):
     base = "https://api.etherscan.io/v2/api"
     params = {
@@ -123,6 +129,7 @@ def _etherscan_v2_proxy_eth_getBalance(address: str, chain: str):
     r.raise_for_status()
     return r.json()
 
+@safe_request
 def _etherscan_v2_proxy_eth_getTransactionCount(address: str, chain: str):
     base = "https://api.etherscan.io/v2/api"
     params = {
@@ -137,6 +144,7 @@ def _etherscan_v2_proxy_eth_getTransactionCount(address: str, chain: str):
     r.raise_for_status()
     return r.json()
 
+@safe_request
 def get_eth_address_stats(address: str, chain: str = "ethereum"):
     """
     Devuelve dict con:
@@ -161,6 +169,7 @@ def get_eth_address_stats(address: str, chain: str = "ethereum"):
 # ---------------------------
 # Parser ERC-20 transfers desde logs del receipt
 # ---------------------------
+@safe_request
 def parse_erc20_transfers_from_receipt(receipt_json: dict):
     """
     Devuelve lista de dicts:
@@ -189,6 +198,7 @@ def parse_erc20_transfers_from_receipt(receipt_json: dict):
 # ---------------------------
 # TRON (TRX): TX + CUENTA (sin API key, TronScan)
 # ---------------------------
+@safe_request
 def get_tron_tx(txid: str):
     """
     TronScan: info de transacción por hash (64 hex).
@@ -215,6 +225,7 @@ def get_tron_tx(txid: str):
         pass
     return None
 
+@safe_request
 def get_tron_account(address: str):
     """
     TronScan: info de cuenta (balance y tokens). Address en formato base58 (empieza por 'T').
