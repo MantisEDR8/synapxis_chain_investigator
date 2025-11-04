@@ -17,11 +17,11 @@ ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
 def http_get(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
-    return requests.get(url, **kwargs)
+    return http_get(url, **kwargs)
 
 def http_post(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
-    return requests.post(url, **kwargs)
+    return http_post(url, **kwargs)
 
 # ---------------------------
 # Detectores básicos
@@ -62,7 +62,7 @@ def _etherscan_v2_proxy_receipt(txhash: str, chain: str):
         "txhash": txhash,
         "apikey": ETHERSCAN_API_KEY
     }
-    r = requests.get(base, params=params, timeout=20)
+    r = http_get(base, params=params, timeout=20)
     r.raise_for_status()
     try:
         return r.json()
@@ -79,7 +79,7 @@ def get_block_info(block_number_hex: str, chain: str):
         "boolean": "true",
         "apikey": ETHERSCAN_API_KEY
     }
-    r = requests.get(base, params=params, timeout=20)
+    r = http_get(base, params=params, timeout=20)
     r.raise_for_status()
     try:
         return r.json()
@@ -99,7 +99,7 @@ def _etherscan_v2_proxy_eth_getBalance(address: str, chain: str):
         "tag": "latest",
         "apikey": ETHERSCAN_API_KEY
     }
-    r = requests.get(base, params=params, timeout=20)
+    r = http_get(base, params=params, timeout=20)
     r.raise_for_status()
     return r.json()
 
@@ -113,7 +113,7 @@ def _etherscan_v2_proxy_eth_getTransactionCount(address: str, chain: str):
         "tag": "latest",
         "apikey": ETHERSCAN_API_KEY
     }
-    r = requests.get(base, params=params, timeout=20)
+    r = http_get(base, params=params, timeout=20)
     r.raise_for_status()
     return r.json()
 
@@ -175,7 +175,7 @@ def get_tron_tx(txid: str):
     """
     try:
         url = f"https://apilist.tronscanapi.com/api/transaction-info?hash={txid}"
-        r = requests.get(url, timeout=20)
+        r = http_get(url, timeout=20)
         r.raise_for_status()
         data = r.json()
         if data and isinstance(data, dict) and data.get("hash"):
@@ -202,7 +202,7 @@ def get_tron_account(address: str):
     """
     try:
         url = f"https://apilist.tronscanapi.com/api/account?address={address}"
-        r = requests.get(url, timeout=20)
+        r = http_get(url, timeout=20)
         r.raise_for_status()
         data = r.json()
         out = {"balance_trx": None, "raw": data}
