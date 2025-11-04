@@ -2,6 +2,26 @@ import os
 import requests
 from dotenv import load_dotenv
 
+import logging
+
+logger = logging.getLogger(__name__)
+
+def safe_request(func):
+    """Decorador para capturar errores de red o respuesta"""
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.Timeout:
+            logger.error(f"Timeout en {func.__name__}")
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error de red en {func.__name__}: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Error inesperado en {func.__name__}: {e}")
+            return None
+    return wrapper
+
 # Límite de tamaño de entrada para evitar abusos
 MAX_INPUT_LEN = 120
 if len(input_id) > MAX_INPUT_LEN:
