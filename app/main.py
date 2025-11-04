@@ -13,6 +13,23 @@ from app.services.apis import (
 )
 from app.services.report import generate_docx_and_maybe_pdf
 from app.services.risk_engine import evaluate as risk_evaluate
+# --- Middleware límite de tamaño de entrada ---
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+MAX_INPUT_LEN = 120  # caracteres del input (aprox. 10x en cuerpo POST)
+
+@app.middleware("http")
+async def limit_input_size(request: Request, call_next):
+    if request.method == "POST":
+        body = await request.body()
+        if len(body) > MAX_INPUT_LEN * 10:
+            return JSONResponse(
+                status_code=400,
+                content={"detail": f"Entrada demasiado grande (> {MAX_INPUT_LEN} caracteres)."},
+            )
+    return await call_next(request)
+# --- fin middleware ---
 
 # ---------------------------
 # Config & logging
