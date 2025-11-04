@@ -2,6 +2,14 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# Límite de tamaño de entrada para evitar abusos
+MAX_INPUT_LEN = 120
+if len(input_id) > MAX_INPUT_LEN:
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "result": {"summary": f"Entrada demasiado larga (> {MAX_INPUT_LEN} caracteres). Verifica la dirección o hash.", "files": []}
+    }, status_code=400)
+
 load_dotenv()
 
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
