@@ -174,7 +174,32 @@ def generate_docx_and_maybe_pdf(identifier: str,
         _docx_kv(doc, "Fee (nativo)", str(meta.get("fee_native")))
     if meta.get("fee_usd") is not None:
         _docx_kv(doc, "Fee (USD aprox.)", str(meta.get("fee_usd")))
+   
+    # 2.b Balances (si existen en meta)
+balances = (meta or {}).get("balances")
+if balances:
+    _docx_section_title(doc, "2.b Balances")
+    try:
+        # Caso dict simple {token: cantidad}
+        if isinstance(balances, dict) and "raw" not in balances:
+            for k, v in balances.items():
+                _docx_kv(doc, str(k), str(v))
+        else:
+            # Estructuras complejas: imprime JSON truncado
+            from json import dumps
+            txt = dumps(balances, indent=2)
+            for line in txt[:4000].splitlines():  # truncado defensivo
+                _docx_bullet(doc, line)
+    except Exception:
+        _docx_bullet(doc, "No se pudo formatear 'balances' (estructura no estándar).")
 
+# 2.c Direcciones destino detectadas (si las hay)
+targets = (meta or {}).get("targets") or []
+if isinstance(targets, list) and targets:
+    _docx_section_title(doc, "2.c Destinos detectados (recientes)")
+    for addr in targets[:50]:  # tope por seguridad
+        _docx_bullet(doc, f"{addr}")
+                                 
     # 3. Interpretación técnica
     _docx_section_title(doc, "3. Interpretación técnica")
     notes = []
