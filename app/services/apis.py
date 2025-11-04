@@ -12,6 +12,7 @@ if len(input_id) > MAX_INPUT_LEN:
 
 load_dotenv()
 
+DEFAULT_TIMEOUT = 15  # segundos
 ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 
 def http_get(url, **kwargs):
