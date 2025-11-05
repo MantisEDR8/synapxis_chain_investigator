@@ -367,4 +367,5 @@ if isinstance(targets, list) and targets:
     files = [{"name": os.path.basename(docx_path), "path": docx_path}]
     if pdf_generated:
         files.append({"name": os.path.basename(pdf_path), "path": pdf_path})
+    
     return files
