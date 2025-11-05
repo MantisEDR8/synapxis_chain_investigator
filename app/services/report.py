@@ -131,15 +131,13 @@ def _ensure_outputs_dir():
     return outdir
 
 
-def generate_docx_and_maybe_pdf(
-    identifier: str,
-    meta: Dict[str, Any],
-    events: List[Dict[str, Any]],
-    transfers: List[Dict[str, Any]],
-):
+def generate_docx_and_maybe_pdf(identifier: str,
+                                meta: Dict[str, Any],
+                                events: List[Dict[str, Any]],
+                                transfers: List[Dict[str, Any]]):
     """
     Genera DOCX (si hay reportlab también PDF). Fondo blanco, cabecera con logo,
-    sin páginas en blanco, márgenes correctos, y aclaraciones N/D y N/A.
+    márgenes correctos, y aclaraciones N/D y N/A.
     """
     outdir = _ensure_outputs_dir()
     assets_dir = os.path.join(os.getcwd(), "assets")
@@ -156,9 +154,7 @@ def generate_docx_and_maybe_pdf(
     _docx_add_header(doc, assets_dir)
 
     # PORTADA (sin salto de página)
-    _docx_title(
-        doc, "Informe de Análisis — Wallet / Transacción", meta.get("risk_band", "BAJO")
-    )
+    _docx_title(doc, "Informe de Análisis — Wallet / Transacción", meta.get("risk_band", "BAJO"))
 
     # 1. Resumen general
     _docx_section_title(doc, "1. Resumen general")
@@ -167,11 +163,7 @@ def generate_docx_and_maybe_pdf(
     _docx_kv(doc, "Bloque", str(meta.get("block", "N/D")))
     _docx_kv(doc, "Fecha (UTC)", str(meta.get("timestamp", "N/D")))
     _docx_kv(doc, "Estado", str(meta.get("status", "N/D")))
-    _docx_kv(
-        doc,
-        "Riesgo",
-        f"{meta.get('risk_score', 'N/D')}/100 ({meta.get('risk_band', 'N/D')})",
-    )
+    _docx_kv(doc, "Riesgo", f"{meta.get('risk_score', 'N/D')}/100 ({meta.get('risk_band', 'N/D')})")
 
     # 2. Datos básicos
     _docx_section_title(doc, "2. Datos básicos")
@@ -185,32 +177,29 @@ def generate_docx_and_maybe_pdf(
         _docx_kv(doc, "Fee (USD aprox.)", str(meta.get("fee_usd")))
 
     # 2.b Balances (si existen en meta)
+    balances = (meta or {}).get("balances")
+    if balances:
+        _docx_section_title(doc, "2.b Balances")
+        try:
+            # Caso dict simple {token: cantidad}
+            if isinstance(balances, dict) and "raw" not in balances:
+                for k, v in balances.items():
+                    _docx_kv(doc, str(k), str(v))
+            else:
+                # Estructuras complejas: imprime JSON truncado
+                from json import dumps
+                txt = dumps(balances, indent=2)
+                for line in txt[:4000].splitlines():  # truncado defensivo
+                    _docx_bullet(doc, line)
+        except Exception:
+            _docx_bullet(doc, "No se pudo formatear 'balances' (estructura no estándar).")
 
-
-balances = (meta or {}).get("balances")
-if balances:
-    _docx_section_title(doc, "2.b Balances")
-    try:
-        # Caso dict simple {token: cantidad}
-        if isinstance(balances, dict) and "raw" not in balances:
-            for k, v in balances.items():
-                _docx_kv(doc, str(k), str(v))
-        else:
-            # Estructuras complejas: imprime JSON truncado
-            from json import dumps
-
-            txt = dumps(balances, indent=2)
-            for line in txt[:4000].splitlines():  # truncado defensivo
-                _docx_bullet(doc, line)
-    except Exception:
-        _docx_bullet(doc, "No se pudo formatear 'balances' (estructura no estándar).")
-
-# 2.c Direcciones destino detectadas (si las hay)
-targets = (meta or {}).get("targets") or []
-if isinstance(targets, list) and targets:
-    _docx_section_title(doc, "2.c Destinos detectados (recientes)")
-    for addr in targets[:50]:  # tope por seguridad
-        _docx_bullet(doc, f"{addr}")
+    # 2.c Direcciones destino detectadas (si las hay)
+    targets = (meta or {}).get("targets") or []
+    if isinstance(targets, list) and targets:
+        _docx_section_title(doc, "2.c Destinos detectados (recientes)")
+        for addr in targets[:50]:  # tope por seguridad
+            _docx_bullet(doc, f"{addr}")
 
     # 3. Interpretación técnica
     _docx_section_title(doc, "3. Interpretación técnica")
@@ -228,9 +217,7 @@ if isinstance(targets, list) and targets:
 
     # 4. Evaluación de riesgo
     _docx_section_title(doc, "4. Evaluación de riesgo")
-    reasons = meta.get("risk_reasons") or [
-        "Sin señales relevantes con las reglas actuales."
-    ]
+    reasons = meta.get("risk_reasons") or ["Sin señales relevantes con las reglas actuales."]
     for r in reasons:
         _docx_bullet(doc, r)
 
@@ -244,7 +231,7 @@ if isinstance(targets, list) and targets:
         "y heurísticas on-chain (flujo, actividad, uso de contratos/tokens)."
     )
     concl_run.font.name = "Arial"
-    concl_run._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial")
+    concl_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Arial')
     concl_run.font.size = Pt(10)
 
     # 6. Recomendaciones inmediatas
@@ -263,7 +250,7 @@ if isinstance(targets, list) and targets:
         "N/D: No disponible en la captura o no aplicable al tipo de entrada.",
         "N/A: No aplica para el contexto del dato solicitado.",
         "Este informe refleja la información recabada en el momento de la consulta. "
-        "La calificación de riesgo puede variar con nuevos eventos en la red.",
+        "La calificación de riesgo puede variar con nuevos eventos en la red."
     ]
     for a in aclar:
         _docx_bullet(doc, a)
@@ -277,95 +264,31 @@ if isinstance(targets, list) and targets:
         "Documento preliminar — uso interno o académico. No constituye prueba pericial."
     )
     runf.font.name = "Arial"
-    runf._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial")
+    runf._element.rPr.rFonts.set(qn('w:eastAsia'), 'Arial')
     runf.font.size = Pt(8)
 
+    # Guardar DOCX
     doc.save(docx_path)
 
-    # ===== PDF (opcional con reportlab) =====
+    # ===== PDF (opcional) =====
     pdf_generated = False
-    if REPORTLAB_OK:
-        try:
-            c = canvas.Canvas(pdf_path, pagesize=A4)
-            width, height = A4
+    try:
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.pagesizes import A4
+        c = canvas.Canvas(pdf_path, pagesize=A4)
+        c.setFont("Helvetica", 10)
+        textobject = c.beginText(40, 800)
+        textobject.textLine(f"Emitido por: Synapxis — Departamento de Análisis Blockchain • {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+        textobject.textLine("Documento preliminar — uso interno o académico. No constituye prueba pericial.")
+        c.drawText(textobject)
+        c.showPage()
+        c.save()
+        pdf_generated = True
+    except Exception:
+        pdf_generated = False
 
-            # Cabecera con logo + membrete
-            logo_path = os.path.join(assets_dir, "synapxis_logo.png")
-            y = height - 2.2 * cm
-            if os.path.exists(logo_path):
-                c.drawImage(
-                    logo_path,
-                    1.5 * cm,
-                    y - 1.2 * cm,
-                    width=2.6 * cm,
-                    preserveAspectRatio=True,
-                    mask="auto",
-                )
-            c.setFont("Helvetica-Bold", 11)
-            c.drawString(
-                4.5 * cm, y - 0.2 * cm, "SYNAPXIS — Departamento de Análisis Blockchain"
-            )
-
-            # Título + barra riesgo
-            c.setFont("Helvetica-Bold", 16)
-            c.drawString(
-                2 * cm, height - 3.5 * cm, "Informe de Análisis — Wallet / Transacción"
-            )
-            r, g, b = _risk_color(meta.get("risk_band", "BAJO"))
-            c.setFillColorRGB(r / 255.0, g / 255.0, b / 255.0)
-            c.rect(2 * cm, height - 3.7 * cm, 14 * cm, 0.1 * cm, fill=1, stroke=0)
-            c.setFillColor(colors.black)
-
-            # Texto básico
-            c.setFont("Helvetica-Bold", 11)
-            c.drawString(2 * cm, height - 4.5 * cm, "1. Resumen general")
-            c.setFont("Helvetica", 10)
-            lines = [
-                f"Identificador: {identifier}",
-                f"Red: {meta.get('network','N/D')}    Bloque: {meta.get('block','N/D')}",
-                f"Fecha (UTC): {meta.get('timestamp','N/D')}    Estado: {meta.get('status','N/D')}",
-                f"Riesgo: {meta.get('risk_score','N/D')}/100 ({meta.get('risk_band','N/D')})",
-            ]
-            y = height - 5.2 * cm
-            for ln in lines:
-                c.drawString(2 * cm, y, ln)
-                y -= 0.5 * cm
-
-            # Aclaraciones
-            c.setFont("Helvetica-Bold", 11)
-            c.drawString(2 * cm, y - 0.3 * cm, "Aclaraciones")
-            c.setFont("Helvetica", 10)
-            y -= 0.8 * cm
-            acl = [
-                "N/D: No disponible en la captura o no aplicable al tipo de entrada.",
-                "N/A: No aplica para el contexto del dato solicitado.",
-                "Resultado combinado de listas públicas y heurísticas on-chain.",
-            ]
-            for a in acl:
-                c.drawString(2 * cm, y, f"• {a}")
-                y -= 0.5 * cm
-
-            # Pie
-            c.setFont("Helvetica", 8)
-            c.drawString(
-                2 * cm,
-                1.5 * cm,
-                f"Emitido por: Synapxis — Departamento de Análisis Blockchain • {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
-            )
-            c.drawString(
-                2 * cm,
-                1.1 * cm,
-                "Documento preliminar — uso interno o académico. No constituye prueba pericial.",
-            )
-
-            c.showPage()
-            c.save()
-            pdf_generated = True
-        except Exception:
-            pdf_generated = False
-
+    # Archivos de salida
     files = [{"name": os.path.basename(docx_path), "path": docx_path}]
     if pdf_generated:
         files.append({"name": os.path.basename(pdf_path), "path": pdf_path})
-    
     return files
