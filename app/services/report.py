@@ -279,7 +279,7 @@ def generate_docx_and_maybe_pdf(identifier: str,
     runf._element.rPr.rFonts.set(qn('w:eastAsia'), 'Arial')
     runf.font.size = Pt(8)
 
-    # === NUEVO BLOQUE FUSIONAI ===
+       # === BLOQUE FUSIONAI ===
     from app.services.fusion_ai import enrich_with_ai
 
     # 8. Análisis asistido por IA
@@ -292,13 +292,6 @@ def generate_docx_and_maybe_pdf(identifier: str,
         pass
     # === FIN BLOQUE FUSIONAI ===
 
-    doc.save(docx_path)
-
-    files = [{"name": os.path.basename(docx_path), "path": docx_path}]
-    if pdf_generated:
-        files.append({"name": os.path.basename(pdf_path), "path": pdf_path})
-    return files
-
     # Guardar DOCX
     doc.save(docx_path)
 
@@ -310,7 +303,10 @@ def generate_docx_and_maybe_pdf(identifier: str,
         c = canvas.Canvas(pdf_path, pagesize=A4)
         c.setFont("Helvetica", 10)
         textobject = c.beginText(40, 800)
-        textobject.textLine(f"Emitido por: Synapxis — Departamento de Análisis Blockchain • {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+        textobject.textLine(
+            f"Emitido por: Synapxis — Departamento de Análisis Blockchain • "
+            f"{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC"
+        )
         textobject.textLine("Documento preliminar — uso interno o académico. No constituye prueba pericial.")
         c.drawText(textobject)
         c.showPage()
