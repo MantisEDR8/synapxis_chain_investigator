@@ -266,6 +266,38 @@ def generate_docx_and_maybe_pdf(identifier: str,
     runf.font.name = "Arial"
     runf._element.rPr.rFonts.set(qn('w:eastAsia'), 'Arial')
     runf.font.size = Pt(8)
+                                    
+        # Pie corporativo
+    footer = doc.sections[0].footer
+    pf = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
+    runf = pf.add_run(
+        f"Emitido por: Synapxis — Departamento de Análisis Blockchain • "
+        f"{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC\n"
+        "Documento preliminar — uso interno o académico. No constituye prueba pericial."
+    )
+    runf.font.name = "Arial"
+    runf._element.rPr.rFonts.set(qn('w:eastAsia'), 'Arial')
+    runf.font.size = Pt(8)
+
+    # === NUEVO BLOQUE FUSIONAI ===
+    from app.services.fusion_ai import enrich_with_ai
+
+    # 8. Análisis asistido por IA
+    try:
+        ai_summary = enrich_with_ai(meta, events, transfers)
+        if ai_summary and not ai_summary.startswith("[FusionAI no disponible]"):
+            _docx_section_title(doc, "8. Análisis asistido por IA (Synapxis FusionAI)")
+            _docx_bullet(doc, ai_summary)
+    except Exception:
+        pass
+    # === FIN BLOQUE FUSIONAI ===
+
+    doc.save(docx_path)
+
+    files = [{"name": os.path.basename(docx_path), "path": docx_path}]
+    if pdf_generated:
+        files.append({"name": os.path.basename(pdf_path), "path": pdf_path})
+    return files
 
     # Guardar DOCX
     doc.save(docx_path)
