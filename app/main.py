@@ -165,7 +165,7 @@ def analyze(
         if detected_kind == "tx":
             if detected_net == "eth":
                 rcpt = get_tx_receipt(input_id)
-                blk = get_block_info(rcpt["blockNumber"]) if rcpt and rcpt.get("blockNumber") else None
+                blk = get_block_info(rcpt["blockNumber"]) if isinstance(rcpt, dict) and rcpt.get("blockNumber") else None
                 if rcpt:
                     summary.append(f"TX en Ethereum | status={rcpt.get('status')} | block={rcpt.get('blockNumber')}")
                     # transfers ERC-20 si procede
