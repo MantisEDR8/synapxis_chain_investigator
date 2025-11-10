@@ -9,4 +9,4 @@ python-dotenv
 lxml
 python-multipart
 gunicorn
-
+openai
