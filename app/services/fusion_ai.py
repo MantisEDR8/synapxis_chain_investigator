@@ -5,17 +5,25 @@ y genera una interpretación técnica complementaria para el informe final.
 """
 
 import os
-from openai import OpenAI
 
-# Carga la clave desde Render (variable de entorno)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY)
+
+try:
+    from openai import OpenAI
+    _OPENAI_AVAILABLE = True
+except ImportError:
+    OpenAI = None
+    _OPENAI_AVAILABLE = False
+
 
 def enrich_with_ai(meta: dict, events: list, transfers: list) -> str:
     """
     Genera un análisis interpretativo con IA a partir de los datos disponibles.
-    Si los campos están vacíos (N/D), la IA intenta deducir patrón y contexto.
+    Si falta la librería o la API key, devuelve un texto neutro y no rompe nada.
     """
+
+    if not _OPENAI_AVAILABLE or not OPENAI_API_KEY:
+        return "[FusionAI no disponible] Falta librería 'openai' o variable OPENAI_API_KEY."
 
     resumen = {
         "network": meta.get("network", "N/D"),
@@ -50,6 +58,7 @@ def enrich_with_ai(meta: dict, events: list, transfers: list) -> str:
     """
 
     try:
+        client = OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
