@@ -33,12 +33,12 @@ ETHERSCAN_API_KEY = os.getenv("ETHERSCAN_API_KEY")
 @safe_request
 def http_get(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
-    return http_get(url, **kwargs)
+    return requests.get(url, **kwargs)
 
 @safe_request
 def http_post(url, **kwargs):
     kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
-    return http_post(url, **kwargs)
+    return requests.post(url, **kwargs)
 
 # ---------------------------
 # Detectores básicos
