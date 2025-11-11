@@ -285,7 +285,7 @@ def generate_docx_and_maybe_pdf(identifier: str,
     # 8. Análisis asistido por IA
     try:
        ai_summary = enrich_with_ai(meta, events, transfers)
-    if ai_summary:
+       if ai_summary:
         _docx_section_title(doc, "8. Análisis asistido por IA (Synapxis FusionAI)")
         _docx_bullet(doc, ai_summary)
     except Exception as e:
