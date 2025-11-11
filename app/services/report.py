@@ -284,12 +284,14 @@ def generate_docx_and_maybe_pdf(identifier: str,
 
     # 8. Análisis asistido por IA
     try:
-        ai_summary = enrich_with_ai(meta, events, transfers)
-        if ai_summary and not ai_summary.startswith("[FusionAI no disponible]"):
-            _docx_section_title(doc, "8. Análisis asistido por IA (Synapxis FusionAI)")
-            _docx_bullet(doc, ai_summary)
-    except Exception:
-        pass
+       ai_summary = enrich_with_ai(meta, events, transfers)
+    if ai_summary:
+        _docx_section_title(doc, "8. Análisis asistido por IA (Synapxis FusionAI)")
+        _docx_bullet(doc, ai_summary)
+    except Exception as e:
+        _docx_section_title(doc, "8. Análisis asistido por IA (Synapxis FusionAI)")
+        _docx_bullet(doc, f"[FusionAI error] {e}")
+
     # === FIN BLOQUE FUSIONAI ===
 
     # Guardar DOCX
